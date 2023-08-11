@@ -31,7 +31,7 @@ else
 fi
 
 
-username="trumeter"
+username="trader"
 
 ## don't ask for password when using sudo reboot
 
