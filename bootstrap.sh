@@ -199,7 +199,7 @@ echo "Downloading setup.sh..."
 curl -H "Authorization: token $github_token" \
      -H 'Accept: application/vnd.github.v3.raw' \
      -o setup.sh \
-     -L https://api.github.com/repos/TruMeter-Cloud/production_rpi/contents/common/bash/setup.sh
+     -L https://api.github.com/repos/jemamena/BeanstalkPrivate/contents/Trader/scripts/bash/setup.sh
 
 
 
