@@ -18,20 +18,36 @@ trader_type="$1"
 echo "What is your GitHub token?"
 read github_token
 
+# Your GitHub token stored in a variable
+github_token="YOUR_GITHUB_TOKEN_HERE"
+
 # Validate the token
 echo "Validating GitHub token..."
-validation_result=$(curl -s -H "Authorization: token $github_token" https://api.github.com/user/orgs)
+validation_result=$(curl -s -H "Authorization: token $github_token" https://api.github.com/user)
 
-if [[ "$validation_result" == *"TruMeter-Cloud"* ]]; then
-    echo "Token is valid."
+# Check if the token is valid for the user "jemamena"
+if [[ "$validation_result" == *"\"login\":\"jemamena\""* ]]; then
+    echo "Token is valid for user jemamena."
     # You can now use $github_token in your script
 else
-    echo "Token is invalid or does not have access to TruMeter-Cloud."
+    echo "Token is invalid or does not have access to the GitHub account of jemamena."
     exit 1
 fi
 
+# # Validate the token
+# echo "Validating GitHub token..."
+# validation_result=$(curl -s -H "Authorization: token $github_token" https://api.github.com/user/orgs)
 
-username="trader"
+# if [[ "$validation_result" == *"TruMeter-Cloud"* ]]; then
+#     echo "Token is valid."
+#     # You can now use $github_token in your script
+# else
+#     echo "Token is invalid or does not have access to TruMeter-Cloud."
+#     exit 1
+# fi
+
+
+username="beanstalk"
 
 ## don't ask for password when using sudo reboot
 
