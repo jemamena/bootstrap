@@ -161,5 +161,5 @@ echo "Executing setup.sh..."
 
 chmod +x setup.sh
 
-su "$username" -c "/home/$username/setup.sh $os $type"
+su "$username" -c "~/setup.sh $os $type"
 
