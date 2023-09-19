@@ -128,15 +128,15 @@ sudo -u $username ssh-keygen -t rsa -b 4096 -C "javier.ema@trumeter.com" -f /hom
 
 echo "SSH key generated successfully."
 
-public_key=$(sudo -u $username cat /home/$username/.ssh/id_rsa.pub)
+public_key=$(sudo -u $username cat ~/.ssh/id_rsa.pub)
 
 # Start the ssh-agent and add the SSH key to it
-sudo -u $username bash -c 'eval "$(ssh-agent -s)" && ssh-add /home/$current_user/.ssh/id_rsa'
+sudo -u $username bash -c 'eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_rsa'
 
 # Set appropriate permissions on the .ssh directory and its contents
-chown -R $username:$username /home/$username/.ssh
-chmod 700 /home/$username/.ssh
-chmod 600 /home/$username/.ssh/*
+chown -R $username:$username ~/.ssh
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/*
 
 # Use the GitHub API to add the SSH key to the account
 curl -X POST -H "Authorization: token $github_token" \
