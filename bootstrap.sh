@@ -15,7 +15,7 @@ type="$2"
 if [ "$os" == "L" ]; then
   if [ "$type" == "T" ]; then
     username="beanstalk"
-  if [[ $EUID -ne 0 ]]; then
+  elif [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root" 
     exit 1
   fi
@@ -63,7 +63,7 @@ if [ "$os" == "L" ]; then
       # Move the temporary file to the sudoers.d directory
       sudo mv "$temp_sudoers" "$sudoers_file"
       echo "Passwordless apt-get setup for user $username..."
-  
+  fi
   ## don't ask for password when using sudo reboot
   # Check if the sudoers file already exists
   if [ ! -f /etc/sudoers.d/nopsd ]; then
@@ -89,20 +89,31 @@ else
   exit 1
 fi
 
+# Check if jq is installed, and if not, install it
+if ! command -v jq &> /dev/null; then
+    echo "jq is not installed. Installing..."
+    sudo apt-get update
+    sudo apt-get install -y jq
+    echo "jq has been installed."
+fi
+
 
 # Ask user for their GitHub token without displaying it
 echo "What is your GitHub token?"
 read github_token
 
-# Your GitHub token stored in a variable
-github_token="YOUR_GITHUB_TOKEN_HERE"
-
-# Validate the token
 echo "Validating GitHub token..."
 validation_result=$(curl -s -H "Authorization: token $github_token" https://api.github.com/user)
 
-# Check if the token is valid for the user "jemamena"
-if [[ "$validation_result" == *"\"login\":\"jemamena\""* ]]; then
+# Print the response for debugging
+echo "Response from GitHub API:"
+echo "$validation_result"
+
+# Parse the JSON response and extract the "login" field
+login=$(echo "$validation_result" | jq -r '.login')
+
+# Check if the "login" field contains "jemamena"
+if [ "$login" == "jemamena" ]; then
     echo "Token is valid for user jemamena."
     # You can now use $github_token in your script
 else
@@ -120,11 +131,11 @@ echo "Generating a new SSH key..."
 
 
 # Ensure the user's home directory has a .ssh directory
-sudo -u $username mkdir -p /home/$username/.ssh
+sudo -u $username mkdir -p ~/.ssh
 
 # Generate the SSH key as the trumeter user
 # sudo -u $username ssh-keygen -t rsa -b 4096 -C "$email" -f /home/$username/.ssh/id_rsa -N ""
-sudo -u $username ssh-keygen -t rsa -b 4096 -C "javier.ema@trumeter.com" -f /home/$username/.ssh/id_rsa -N ""
+sudo -u $username ssh-keygen -t rsa -b 4096 -C "jemamena@gmail.com" -f ~/.ssh/id_rsa -N ""
 
 echo "SSH key generated successfully."
 
@@ -149,10 +160,9 @@ curl -X POST -H "Authorization: token $github_token" \
 echo "Downloading setup.sh..."
 
 curl -H "Authorization: token $github_token" \
-     -H 'Accept: application/vnd.github.v3.raw' \
-     -o setup.sh \
-     -L https://api.github.com/repos/jemamena/BeanstalkPrivate/contents/Trader/scripts/bash/setup.sh
-
+    -H 'Accept: application/vnd.github.v3.raw' \
+    -o setup.sh \
+    -L https://api.github.com/repos/jemamena/BeanstalkPrivate/contents/common/scripts/bash/setup.sh
 
 
 ## EXECUTE SETUP.SH ##
@@ -161,5 +171,8 @@ echo "Executing setup.sh..."
 
 chmod +x setup.sh
 
-su "$username" -c "~/setup.sh $os $type"
-
+if [ "$type" == "T" ]; then
+  su "$username" -c "~/setup.sh $os $type"
+elif [ "$type" == "T" ]; then
+  ~/setup.sh $os $type
+fi
