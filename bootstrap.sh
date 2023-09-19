@@ -173,6 +173,6 @@ chmod +x setup.sh
 
 if [ "$type" == "T" ]; then
   su "$username" -c "~/setup.sh $os $type"
-elif [ "$type" == "T" ]; then
+elif [ "$type" == "S" ]; then
   ~/setup.sh $os $type
 fi
